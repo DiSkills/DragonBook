@@ -1,0 +1,3 @@
+[submodule "libs/DiTL"]
+	path = libs/DiTL
+	url = https://gitlab.com/DiSkills/DiTL.git
