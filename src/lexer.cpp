@@ -28,6 +28,29 @@ void Lexer::SkipSpaces()
     }
 }
 
+void Lexer::SkipSingleLineComment()
+{
+    do {
+        peek = getchar();
+    } while (peek != '\n' && peek != EOF);
+}
+
+const Token *Lexer::SkipSpacesAndComments()
+{
+    for (;;) {
+        SkipSpaces();
+        if (peek != '/') {
+            return 0;
+        }
+        peek = getchar();
+        if (peek == '/') {
+            SkipSingleLineComment();
+        } else {
+            return new Token('/');
+        }
+    }
+}
+
 const Number *Lexer::ScanNumber()
 {
     if (IsDigit(peek)) {
@@ -64,7 +87,10 @@ const Word *Lexer::ScanLexeme()
 
 const Token *Lexer::Scan()
 {
-    SkipSpaces();
+    const Token *token = SkipSpacesAndComments();
+    if (token) {
+        return token;
+    }
     const Number *number = ScanNumber();
     if (number) {
         return number;
@@ -73,7 +99,7 @@ const Token *Lexer::Scan()
     if (word) {
         return word;
     }
-    const Token *token = new Token(peek);
+    token = new Token(peek);
     peek = ' ';
     return token;
 }

@@ -73,6 +73,8 @@ private:
     void Reserve(Word *w) { words.Put(w->GetLexeme(), w); }
 
     void SkipSpaces();
+    void SkipSingleLineComment();
+    const Token *SkipSpacesAndComments();
     const Number *ScanNumber();
     const Word *ScanLexeme();
 
