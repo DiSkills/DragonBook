@@ -137,8 +137,8 @@ const Token *Lexer::ScanTwoCharToken(char first, char second, int tag)
 
 const Token *Lexer::ScanComparisonOperator()
 {
-    const char chars[] = { '<', '>', '=', '!' };
-    const int tags[] = { LTE, GTE, EQ, NEQ };
+    static const char chars[] = { '<', '>', '=', '!' };
+    static const int tags[] = { LTE, GTE, EQ, NEQ };
 
     unsigned int size = sizeof(chars) / sizeof(*chars);
     for (unsigned int i = 0; i < size; i++) {
@@ -153,7 +153,7 @@ const Token *Lexer::ScanComparisonOperator()
 const Token *Lexer::Scan()
 {
     typedef const Token *(Lexer::*pscan)();
-    const pscan scanners[] = {
+    static const pscan scanners[] = {
         &Lexer::SkipSpacesAndComments,
         &Lexer::ScanNumber, &Lexer::ScanLexeme,
         &Lexer::ScanComparisonOperator,
