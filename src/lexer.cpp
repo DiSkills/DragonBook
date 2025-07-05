@@ -67,7 +67,7 @@ const Token *Lexer::SkipSpacesAndComments()
     }
 }
 
-const Number *Lexer::ScanNumber()
+const Token *Lexer::ScanNumber()
 {
     if (IsDigit(peek)) {
         int v = 0;
@@ -75,12 +75,33 @@ const Number *Lexer::ScanNumber()
             v = v * 10 + (peek - '0');
             peek = getchar();
         } while (IsDigit(peek));
-        return new Number(v);
+
+        if (peek != '.') {
+            return new Number(v);
+        }
+        double f = v, divisor = 10;
+        while (IsDigit(peek = getchar())) {
+            f += (peek - '0') / divisor;
+            divisor *= 10;
+        }
+        return new Real(f);
+    } else if (peek == '.') {
+        peek = getchar();
+        if (!IsDigit(peek)) {
+            return new Token('.');
+        }
+        double f = 0, divisor = 10;
+        do {
+            f += (peek - '0') / divisor;
+            divisor *= 10;
+            peek = getchar();
+        } while (IsDigit(peek));
+        return new Real(f);
     }
     return 0;
 }
 
-const Word *Lexer::ScanLexeme()
+const Token *Lexer::ScanLexeme()
 {
     if (IsLetter(peek)) {
         lexeme_buffer.Clear();
@@ -135,13 +156,13 @@ const Token *Lexer::Scan()
     if (token) {
         return token;
     }
-    const Number *number = ScanNumber();
-    if (number) {
-        return number;
+    token = ScanNumber();
+    if (token) {
+        return token;
     }
-    const Word *word = ScanLexeme();
-    if (word) {
-        return word;
+    token = ScanLexeme();
+    if (token) {
+        return token;
     }
     token = ScanComparisonOperator();
     if (token) {

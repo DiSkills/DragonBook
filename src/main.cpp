@@ -20,6 +20,7 @@ static const char *get_token_string(int tag)
 static bool print_token(const Token *token)
 {
     const Number *n;
+    const Real *r;
     const Word *w;
 
     int tag = token->GetTag();
@@ -39,6 +40,10 @@ static bool print_token(const Token *token)
     case NUMBER:
         n = static_cast<const Number*>(token);
         printf("Number: %d\n", n->GetValue());
+        return true;
+    case REAL:
+        r = static_cast<const Real*>(token);
+        printf("Real: %f\n", r->GetValue());
         return true;
     }
 

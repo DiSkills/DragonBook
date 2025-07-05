@@ -7,9 +7,10 @@
 #include "buffer.hpp"
 
 enum {
-    NUMBER = 256, ID = 257,
-    TRUE = 258, FALSE = 259,
-    LTE = 260, EQ = 261, NEQ = 262, GTE = 263,
+    ID = 256,
+    TRUE, FALSE,
+    NUMBER, REAL,
+    LTE, GTE, EQ, NEQ,
 };
 
 class Token {
@@ -27,6 +28,14 @@ public:
     Number(int v) : Token(NUMBER), value(v) {}
     virtual ~Number() {}
     int GetValue() const { return value; }
+};
+
+class Real : public Token {
+    const double value;
+public:
+    Real(double v) : Token(REAL), value(v) {}
+    virtual ~Real() {}
+    double GetValue() const { return value; }
 };
 
 class Word : public Token {
@@ -82,8 +91,8 @@ private:
     const Token *ScanTwoCharToken(char first, char second, int tag);
 
     const Token *SkipSpacesAndComments();
-    const Number *ScanNumber();
-    const Word *ScanLexeme();
+    const Token *ScanNumber();
+    const Token *ScanLexeme();
     const Token *ScanComparisonOperator();
 
     static bool IsSpace(char c) { return c == ' ' || c == '\t' || c == '\n'; }
