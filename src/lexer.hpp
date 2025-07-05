@@ -74,6 +74,7 @@ private:
 
     void SkipSpaces();
     void SkipSingleLineComment();
+    void SkipComment();
     const Token *SkipSpacesAndComments();
     const Number *ScanNumber();
     const Word *ScanLexeme();

@@ -35,6 +35,20 @@ void Lexer::SkipSingleLineComment()
     } while (peek != '\n' && peek != EOF);
 }
 
+void Lexer::SkipComment()
+{
+    char prev;
+    peek = ' ';
+    do {
+        prev = peek;
+        peek = getchar();
+        if (peek == '\n') {
+            line++;
+        }
+    } while (peek != EOF && (prev != '*' || peek != '/'));
+    peek = (peek == EOF) ? EOF : ' ';
+}
+
 const Token *Lexer::SkipSpacesAndComments()
 {
     for (;;) {
@@ -45,6 +59,8 @@ const Token *Lexer::SkipSpacesAndComments()
         peek = getchar();
         if (peek == '/') {
             SkipSingleLineComment();
+        } else if (peek == '*') {
+            SkipComment();
         } else {
             return new Token('/');
         }
