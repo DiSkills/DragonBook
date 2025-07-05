@@ -2,34 +2,53 @@
 
 #include "lexer.hpp"
 
+static const char *get_token_string(int tag)
+{
+    switch (tag) {
+    case LTE:
+        return "<=";
+    case GTE:
+        return ">=";
+    case EQ:
+        return "==";
+    case NEQ:
+        return "!=";
+    }
+    return 0;
+}
+
 static bool print_token(const Token *token)
 {
     const Number *n;
     const Word *w;
 
-    bool res = true;
-    switch (token->GetTag()) {
+    int tag = token->GetTag();
+    switch (tag) {
     case EOF:
-        res = false;
-        break;
+        return false;
     case TRUE:
         printf("Boolean: true\n");
-        break;
+        return true;
     case FALSE:
         printf("Boolean: false\n");
-        break;
+        return true;
     case ID:
         w = static_cast<const Word*>(token);
         printf("Identifier: %s\n", w->GetLexeme());
-        break;
+        return true;
     case NUMBER:
         n = static_cast<const Number*>(token);
         printf("Number: %d\n", n->GetValue());
-        break;
-    default:
-        printf("Token: %c\n", token->GetTag());
+        return true;
     }
-    return res;
+
+    const char *s = get_token_string(tag);
+    if (s) {
+        printf("Token: %s\n", s);
+    } else {
+        printf("Token: %c\n", tag);
+    }
+    return true;
 }
 
 int main()

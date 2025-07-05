@@ -6,7 +6,11 @@
 
 #include "buffer.hpp"
 
-enum { NUMBER = 256, ID = 257, TRUE = 258, FALSE = 259 };
+enum {
+    NUMBER = 256, ID = 257,
+    TRUE = 258, FALSE = 259,
+    LTE = 260, EQ = 261, NEQ = 262, GTE = 263,
+};
 
 class Token {
 protected:
@@ -75,9 +79,12 @@ private:
     void SkipSpaces();
     void SkipSingleLineComment();
     void SkipComment();
+    const Token *ScanTwoCharToken(char first, char second, int tag);
+
     const Token *SkipSpacesAndComments();
     const Number *ScanNumber();
     const Word *ScanLexeme();
+    const Token *ScanComparisonOperator();
 
     static bool IsSpace(char c) { return c == ' ' || c == '\t' || c == '\n'; }
     static bool IsDigit(char c) { return '0' <= c && c <= '9'; }

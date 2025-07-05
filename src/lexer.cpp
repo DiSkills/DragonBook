@@ -101,6 +101,34 @@ const Word *Lexer::ScanLexeme()
     return 0;
 }
 
+const Token *Lexer::ScanTwoCharToken(char first, char second, int tag)
+{
+    if (peek == first) {
+        peek = getchar();
+        if (peek == second) {
+            peek = ' ';
+            return new Token(tag);
+        }
+        return new Token(first);
+    }
+    return 0;
+}
+
+const Token *Lexer::ScanComparisonOperator()
+{
+    const char chars[] = { '<', '>', '=', '!' };
+    const int tags[] = { LTE, GTE, EQ, NEQ };
+
+    unsigned int size = sizeof(chars) / sizeof(*chars);
+    for (unsigned int i = 0; i < size; i++) {
+        const Token *token = ScanTwoCharToken(chars[i], '=', tags[i]);
+        if (token) {
+            return token;
+        }
+    }
+    return 0;
+}
+
 const Token *Lexer::Scan()
 {
     const Token *token = SkipSpacesAndComments();
@@ -114,6 +142,10 @@ const Token *Lexer::Scan()
     const Word *word = ScanLexeme();
     if (word) {
         return word;
+    }
+    token = ScanComparisonOperator();
+    if (token) {
+        return token;
     }
     token = new Token(peek);
     peek = ' ';
