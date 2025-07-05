@@ -152,23 +152,21 @@ const Token *Lexer::ScanComparisonOperator()
 
 const Token *Lexer::Scan()
 {
-    const Token *token = SkipSpacesAndComments();
-    if (token) {
-        return token;
+    typedef const Token *(Lexer::*pscan)();
+    const pscan scanners[] = {
+        &Lexer::SkipSpacesAndComments,
+        &Lexer::ScanNumber, &Lexer::ScanLexeme,
+        &Lexer::ScanComparisonOperator,
+    };
+    unsigned int size = sizeof(scanners) / sizeof(*scanners);
+    for (unsigned int i = 0; i < size; i++) {
+        const pscan scan = scanners[i];
+        const Token *token = (this->*scan)();
+        if (token) {
+            return token;
+        }
     }
-    token = ScanNumber();
-    if (token) {
-        return token;
-    }
-    token = ScanLexeme();
-    if (token) {
-        return token;
-    }
-    token = ScanComparisonOperator();
-    if (token) {
-        return token;
-    }
-    token = new Token(peek);
+    const Token *token = new Token(peek);
     peek = ' ';
     return token;
 }
