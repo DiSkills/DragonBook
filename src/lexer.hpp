@@ -14,8 +14,7 @@ enum {
 };
 
 class Token {
-protected:
-    const int tag;
+    int tag;
 public:
     Token(int t) : tag(t) {}
     virtual ~Token() {}
@@ -23,7 +22,7 @@ public:
 };
 
 class Number : public Token {
-    const int value;
+    int value;
 public:
     Number(int v) : Token(NUMBER), value(v) {}
     virtual ~Number() {}
@@ -31,7 +30,7 @@ public:
 };
 
 class Real : public Token {
-    const double value;
+    double value;
 public:
     Real(double v) : Token(REAL), value(v) {}
     virtual ~Real() {}
@@ -39,7 +38,7 @@ public:
 };
 
 class Word : public Token {
-    const char *const lexeme;
+    const char *lexeme;
     bool owner;
 public:
     Word(int t, const char *l, bool own = true)
@@ -63,11 +62,14 @@ public:
     const Value &GetValue() const { return value; }
     void SetKey(const Key &k) { key = k; }
     void SetValue(const Value &v) { delete value; value = v; }
+private:
+    Pair(const Pair<Key, Word*> &);
+    void operator=(const Pair<Key, Word*> &);
 };
 
 class Lexer {
     class Lexeme {
-        const char * const str; /* isn't the owner */
+        const char *str; /* isn't the owner */
     public:
         Lexeme(const char *s) : str(s) {}
         unsigned int Hash() const;
@@ -80,7 +82,7 @@ class Lexer {
     Buffer lexeme_buffer;
 public:
     Lexer();
-    const Token *Scan();
+    Token *Scan();
     unsigned int GetLine() const { return line; }
 private:
     void Reserve(Word *w) { words.Put(w->GetLexeme(), w); }
@@ -88,12 +90,12 @@ private:
     void SkipSpaces();
     void SkipSingleLineComment();
     void SkipComment();
-    const Token *ScanTwoCharToken(char first, char second, int tag);
+    Token *ScanTwoCharToken(char first, char second, int tag);
 
-    const Token *SkipSpacesAndComments();
-    const Token *ScanNumber();
-    const Token *ScanLexeme();
-    const Token *ScanComparisonOperator();
+    Token *SkipSpacesAndComments();
+    Token *ScanNumber();
+    Token *ScanLexeme();
+    Token *ScanComparisonOperator();
 
     static bool IsSpace(char c) { return c == ' ' || c == '\t' || c == '\n'; }
     static bool IsDigit(char c) { return '0' <= c && c <= '9'; }

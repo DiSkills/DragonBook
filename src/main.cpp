@@ -61,9 +61,9 @@ int main()
     Lexer lex;
     bool loop;
     do {
-        const Token *token = lex.Scan();
+        Token *token = lex.Scan();
         loop = print_token(token);
         delete token;
-    } while(loop);
+    } while (loop);
     return 0;
 }

@@ -49,7 +49,7 @@ void Lexer::SkipComment()
     peek = (peek == EOF) ? EOF : ' ';
 }
 
-const Token *Lexer::SkipSpacesAndComments()
+Token *Lexer::SkipSpacesAndComments()
 {
     for (;;) {
         SkipSpaces();
@@ -65,9 +65,10 @@ const Token *Lexer::SkipSpacesAndComments()
             return new Token('/');
         }
     }
+    return 0;
 }
 
-const Token *Lexer::ScanNumber()
+Token *Lexer::ScanNumber()
 {
     if (IsDigit(peek)) {
         int v = 0;
@@ -101,7 +102,7 @@ const Token *Lexer::ScanNumber()
     return 0;
 }
 
-const Token *Lexer::ScanLexeme()
+Token *Lexer::ScanLexeme()
 {
     if (IsLetter(peek)) {
         lexeme_buffer.Clear();
@@ -122,7 +123,7 @@ const Token *Lexer::ScanLexeme()
     return 0;
 }
 
-const Token *Lexer::ScanTwoCharToken(char first, char second, int tag)
+Token *Lexer::ScanTwoCharToken(char first, char second, int tag)
 {
     if (peek == first) {
         peek = getchar();
@@ -135,14 +136,14 @@ const Token *Lexer::ScanTwoCharToken(char first, char second, int tag)
     return 0;
 }
 
-const Token *Lexer::ScanComparisonOperator()
+Token *Lexer::ScanComparisonOperator()
 {
     static const char chars[] = { '<', '>', '=', '!' };
     static const int tags[] = { LTE, GTE, EQ, NEQ };
 
     unsigned int size = sizeof(chars) / sizeof(*chars);
     for (unsigned int i = 0; i < size; i++) {
-        const Token *token = ScanTwoCharToken(chars[i], '=', tags[i]);
+        Token *token = ScanTwoCharToken(chars[i], '=', tags[i]);
         if (token) {
             return token;
         }
@@ -150,9 +151,9 @@ const Token *Lexer::ScanComparisonOperator()
     return 0;
 }
 
-const Token *Lexer::Scan()
+Token *Lexer::Scan()
 {
-    typedef const Token *(Lexer::*pscan)();
+    typedef Token *(Lexer::*pscan)();
     static const pscan scanners[] = {
         &Lexer::SkipSpacesAndComments,
         &Lexer::ScanNumber, &Lexer::ScanLexeme,
@@ -160,13 +161,12 @@ const Token *Lexer::Scan()
     };
     unsigned int size = sizeof(scanners) / sizeof(*scanners);
     for (unsigned int i = 0; i < size; i++) {
-        const pscan scan = scanners[i];
-        const Token *token = (this->*scan)();
+        Token *token = (this->*scanners[i])();
         if (token) {
             return token;
         }
     }
-    const Token *token = new Token(peek);
+    Token *token = new Token(peek);
     peek = ' ';
     return token;
 }
